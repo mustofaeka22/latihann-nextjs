@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { events, rupiah } from "@/data/events";
 
@@ -8,6 +9,10 @@ export default async function Detail({ params }: PageProps<"/event/[id]">) {
 
   const sisa = event.kuota - event.terisi;
   return (
+    <div>
+    <Link href="/event" className="mb-4 inline-block text-blue-600 hover:underline">
+  ← Kembali ke katalog
+    </Link>
     <article className="rounded-xl border bg-white p-6">
       <span className="rounded bg-blue-100 px-2 py-0.5 text-xs text-blue-700">
         {event.kategori}
@@ -19,5 +24,6 @@ export default async function Detail({ params }: PageProps<"/event/[id]">) {
       <p className="mt-4 text-xl font-semibold">{rupiah(event.harga)}</p>
       <p className="text-slate-600">Sisa {sisa} dari {event.kuota} tiket</p>
     </article>
+    </div>
   );
 }
