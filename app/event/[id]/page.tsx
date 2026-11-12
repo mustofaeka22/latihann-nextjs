@@ -1,51 +1,97 @@
 import Link from "next/link";
 import { events, rupiah } from "@/data/events";
-import { notFound } from "next/navigation";
+import FormPesan from "@/components/FormPesan"; // Sesuaikan jalur lokasi FormPesan
 
-type Props = {
+export default async function DetailEventPage({
+  params,
+}: {
   params: Promise<{ id: string }>;
-};
+}) {
+  const { id } = await params;
+  const eventId = Number(id);
+  const event = events.find((e) => e.id === eventId);
 
-export default async function DetailEventPage({ params }: Props) {
-  const resolvedParams = await params;
-  
-  const event = events.find((e) => String(e.id) === String(resolvedParams.id));
-  if (!event) notFound();
+  if (!event) {
+    return (
+      <div className="p-8 text-center">
+        <p>Event tidak ditemukan.</p>
+        <Link href="/event" className="text-blue-600 underline text-sm mt-2 inline-block">
+          ← Kembali ke katalog
+        </Link>
+      </div>
+    );
+  }
 
-  // Mencari event terkait: kategori sama DAN bukan event itu sendiri
+  const sisa = event.kuota - event.terisi;
+
+  // Filter event terkait (kategori sama, kecuali event ini sendiri)
   const eventTerkait = events.filter(
-    (e) => e.kategori === event.kategori && String(e.id) !== String(event.id)
+    (e) => e.kategori === event.kategori && e.id !== event.id
   );
 
   return (
-    <div className="mx-auto max-w-3xl p-6">
-      <span className="rounded bg-blue-100 px-2 py-0.5 text-xs text-blue-700">
-        {event.kategori}
-      </span>
-      <h1 className="mt-2 text-2xl font-bold">{event.judul}</h1>
-      <p className="text-slate-500">{event.tanggal} · {event.lokasi}</p>
-      
-      <div className="my-4 font-medium">{rupiah(event.harga)}</div>
+    <div className="max-w-2xl mx-auto py-6 px-4 space-y-4">
+      {/* 1. Tombol Kembali */}
+      <Link href="/event" className="text-blue-600 hover:underline text-sm font-medium">
+        ← Kembali ke katalog
+      </Link>
 
-      {/* Bagian Event Terkait (Langkah 8) */}
-      <div className="mt-8 border-t pt-6">
-        <h2 className="mb-4 text-lg font-semibold">Event terkait</h2>
-        {eventTerkait.length === 0 ? (
-          <p className="text-slate-500">Belum ada event terkait.</p>
-        ) : (
-          <div className="grid gap-3 sm:grid-cols-2">
+      {/* Header Event */}
+      <div className="space-y-2">
+        <div>
+          <span className="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded">
+            {event.kategori}
+          </span>
+        </div>
+        <h1 className="text-2xl font-bold text-slate-900">{event.judul}</h1>
+        <p className="text-sm text-slate-500">
+          {event.tanggal} · {event.lokasi}
+        </p>
+      </div>
+
+      {/* Harga & Informasi Sisa Tiket */}
+      <div className="space-y-1">
+        <p className="text-lg font-bold">
+          {event.harga === 0 ? "Gratis" : rupiah(event.harga)}
+        </p>
+        <p className="text-sm text-slate-600">
+          Sisa {sisa} dari {event.kuota} tiket
+        </p>
+      </div>
+
+      {/* Tombol Favorit */}
+      <div>
+        <button className="border border-slate-300 rounded px-3 py-1 text-sm font-normal hover:bg-slate-50">
+          ♡ Tambah favorit
+        </button>
+      </div>
+
+      {/* Form Pemesanan Tiket */}
+      <FormPesan event={event} />
+
+      <hr className="my-6 border-slate-300" />
+
+      {/* Event Terkait */}
+      <div className="space-y-3">
+        <h3 className="text-base font-bold">Event Terkait</h3>
+        {eventTerkait.length > 0 ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {eventTerkait.map((item) => (
-              <div key={item.id} className="rounded border p-3 shadow-sm">
-                <span className="text-xs text-blue-600">{item.kategori}</span>
-                <h3 className="font-semibold">
-                  <Link href={`/event/${item.id}`} className="hover:underline text-blue-700">
-                    {item.judul}
-                  </Link>
-                </h3>
-                <p className="text-xs text-slate-500">{item.tanggal}</p>
-              </div>
+              <Link
+                key={item.id}
+                href={`/event/${item.id}`}
+                className="border border-slate-300 rounded p-3 block hover:border-blue-500 transition"
+              >
+                <span className="text-[11px] text-blue-600">{item.kategori}</span>
+                <h4 className="font-semibold text-blue-600 text-sm mt-0.5">
+                  {item.judul}
+                </h4>
+                <p className="text-xs text-slate-500 mt-1">{item.tanggal}</p>
+              </Link>
             ))}
           </div>
+        ) : (
+          <p className="text-sm text-slate-500">Belum ada event terkait.</p>
         )}
       </div>
     </div>
