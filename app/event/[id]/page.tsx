@@ -1,6 +1,7 @@
 import Link from "next/link";
+import { cookies } from "next/headers";
 import { events, rupiah } from "@/data/events";
-import FormPesan from "@/components/FormPesan"; // Sesuaikan jalur lokasi FormPesan
+import FormPesan from "@/components/FormPesan";
 
 export default async function DetailEventPage({
   params,
@@ -15,7 +16,10 @@ export default async function DetailEventPage({
     return (
       <div className="p-8 text-center">
         <p>Event tidak ditemukan.</p>
-        <Link href="/event" className="text-blue-600 underline text-sm mt-2 inline-block">
+        <Link
+          href="/event"
+          className="text-blue-600 underline text-sm mt-2 inline-block"
+        >
           ← Kembali ke katalog
         </Link>
       </div>
@@ -24,10 +28,11 @@ export default async function DetailEventPage({
 
   const sisa = event.kuota - event.terisi;
 
-  // Filter event terkait (kategori sama, kecuali event ini sendiri)
   const eventTerkait = events.filter(
     (e) => e.kategori === event.kategori && e.id !== event.id
   );
+
+  const namaAwal = (await cookies()).get("nama")?.value ?? "";
 
   return (
     <div className="max-w-2xl mx-auto py-6 px-4 space-y-4">
@@ -67,7 +72,7 @@ export default async function DetailEventPage({
       </div>
 
       {/* Form Pemesanan Tiket */}
-      <FormPesan event={event} />
+      <FormPesan event={event} namaAwal={namaAwal} />
 
       <hr className="my-6 border-slate-300" />
 
