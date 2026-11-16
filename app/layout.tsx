@@ -1,21 +1,27 @@
-import type { Metadata } from "next";
+import localFont from "next/font/local";
 import "./globals.css";
-import Navbar from "@/components/Navbar";
 
-export const metadata: Metadata = {
-  title: "Eventku",
-  description: "Katalog dan pemesanan tiket event sekolah",
+const poppins = localFont({
+  src: [
+    { path: "./fonts/Poppins-Regular.ttf", weight: "400" },
+    { path: "./fonts/Poppins-Bold.ttf", weight: "700" },
+  ],
+});
+
+export const metadata = {
+  title: { default: "EventKu", template: "%s · EventKu" },
+  description: "Aplikasi Manajemen Event",
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default function RootLayout({
+  children,
+}: Readonly<{
+  children: React.ReactNode;
+}>) {
   return (
-    <html lang="id" className="antialiased">
-      <body className="min-h-screen flex flex-col bg-slate-50 text-slate-800">
-        <Navbar />
-        <main className="mx-auto w-full max-w-5xl flex-1 p-6">{children}</main>
-        <footer className="border-t bg-white p-4 text-center text-sm text-slate-500">
-          EventKu · dibuat di kelas Junior Web Developer
-        </footer>
+    <html lang="id">
+      <body className={`${poppins.className} flex min-h-screen flex-col bg-slate-50 text-slate-800`}>
+        {children}
       </body>
     </html>
   );

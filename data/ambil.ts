@@ -7,16 +7,18 @@ function jeda(ms: number) {
 
 export async function ambilEvents() {
   await jeda(1500);
-  throw new Error ("Database sedang mati");
   return events;
 }
 
-export async function ambilEvent(id: number) {
+export async function ambilEvent(id: string | number) {
   await jeda(800);
-  return events.find((e) => e.id === id);
+  // Menggunakan String() casting agar aman mencocokkan string dan number
+  return events.find((e) => String(e.id) === String(id));
 }
 
 export async function ambilTerkait(event: Event) {
   await jeda(2000);
-  return events.filter((e) => e.kategori === event.kategori && e.id !== event.id);
+  return events.filter(
+    (e) => e.kategori === event.kategori && String(e.id) !== String(event.id)
+  );
 }
