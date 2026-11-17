@@ -78,7 +78,7 @@ export default async function HalamanDetailEvent({ params }: PageProps) {
 
         <div>
           <h2 className="text-lg font-bold text-slate-800 mb-4">Pendaftaran Event</h2>
-          <FormPesan event={event} namaAwal="" />
+          <FormPesan eventId={String(event.id)} harga={event.harga ?? 0} />
         </div>
       </article>
     </main>
