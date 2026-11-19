@@ -4,7 +4,7 @@ export type Event = {
   deskripsi: string;
   tanggal: string;
   lokasi: string;
-  gambar?: string;
+  gambar?: string | null;
   kuota: number;
   terisi: number;
   kategori?: string;

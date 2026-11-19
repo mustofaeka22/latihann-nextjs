@@ -1,3 +1,5 @@
+"use client"
+
 import { rupiah } from "@/data/events";
 import { useState } from "react";
 
