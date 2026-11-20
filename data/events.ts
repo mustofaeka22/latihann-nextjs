@@ -1,5 +1,5 @@
 export type Event = {
-  id: string | number;
+  id: number;
   judul: string;
   deskripsi: string;
   tanggal: string;
@@ -8,7 +8,7 @@ export type Event = {
   kuota: number;
   terisi: number;
   kategori?: string;
-  harga?: number;
+  harga: number;
 };
 
 // Fungsi format rupiah untuk kebutuhan tampilan & metadata
@@ -22,7 +22,7 @@ export function rupiah(angka: number): string {
 
 export const events: Event[] = [
   {
-    id: "1",
+    id: 1,
     judul: "Workshop Next.js Dasar",
     deskripsi: "Belajar membuat web modern dengan Next.js bersama expert industri secara langsung.",
     tanggal: "20 Desember 2026",
@@ -34,7 +34,7 @@ export const events: Event[] = [
     harga: 150000,
   },
   {
-    id: "2",
+    id: 2,
     judul: "Pelatihan UI/UX Design Modern",
     deskripsi: "Memahami dasar-dasar desain antarmuka pengguna yang menarik dan ramah pengguna.",
     tanggal: "22 Desember 2026",
@@ -46,7 +46,7 @@ export const events: Event[] = [
     harga: 100000,
   },
   {
-    id: "3",
+    id: 3,
     judul: "Seminar Kewirausahaan Digital",
     deskripsi: "Strategi membangun bisnis rintisan di era digital dari nol hingga berkembang.",
     tanggal: "28 Desember 2026",
@@ -58,7 +58,7 @@ export const events: Event[] = [
     harga: 75000,
   },
   {
-    id: "4",
+    id: 4,
     judul: "Coding Bootcamp Python & AI",
     deskripsi: "Pengenalan pemrograman Python untuk kecerdasan buatan dan pengolahan data.",
     tanggal: "5 Januari 2027",
@@ -70,7 +70,7 @@ export const events: Event[] = [
     harga: 200000,
   },
   {
-    id: "5",
+    id: 5,
     judul: "Pameran Seni & Kreativitas Lokal",
     deskripsi: "Menampilkan karya seni rupa, kerajinan, dan inovasi dari kreator muda lokal.",
     tanggal: "10 Januari 2027",
@@ -82,7 +82,7 @@ export const events: Event[] = [
     harga: 50000,
   },
   {
-    id: "6",
+    id: 6,
     judul: "Digital Marketing Masterclass",
     deskripsi: "Trik jitu optimasi media sosial dan iklan berbayar untuk meningkatkan penjualan produk.",
     tanggal: "15 Januari 2027",

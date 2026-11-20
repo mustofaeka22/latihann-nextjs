@@ -1,86 +1,62 @@
-import { notFound } from "next/navigation";
+import { Suspense } from "react";
 import Image from "next/image";
 import type { Metadata } from "next";
-import { events, rupiah } from "@/data/events";
-import { ambilEvent } from "@/data/ambil";
-import FormPesan from "@/components/FormPesan";
+import { notFound } from "next/navigation";
+import { cookies } from "next/headers";
+import { rupiah } from "@/data/events";
+import { ambilEvent, ambilTerkait, hitungPesanan, hitungTiket } from "@/data/ambil";import FormPesan from "@/components/FormPesan";
 import TombolFavorit from "@/components/TombolFavorit";
+import EventTerkait from "@/components/EventTerkait";
 
-type PageProps = {
-  params: Promise<{ id: string }>;
-};
-
-// Fungsi generateMetadata sesuai Langkah 9
-export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+export async function generateMetadata({ params }: PageProps<"/event/[id]">): Promise<Metadata> {
   const { id } = await params;
-  const event = events.find((e) => e.id === Number(id) || String(e.id) === String(id));
+  const event = await ambilEvent(Number(id));
   if (!event) return { title: "Event tidak ditemukan" };
   return {
     title: event.judul,
-    description: `${event.kategori} di ${event.lokasi}, ${event.tanggal}. ${rupiah ? rupiah(event.harga ?? 0) : ''}`,
+    description: `${event.kategori} di ${event.lokasi}, ${event.tanggal}. ${rupiah(event.harga)}.`,
   };
 }
 
-export default async function HalamanDetailEvent({ params }: PageProps) {
-  const resolvedParams = await params;
-  const event = await ambilEvent(resolvedParams.id);
-
-  if (!event) {
-    notFound();
-  }
-
+export default async function Detail({ params }: PageProps<"/event/[id]">) {
+  const { id } = await params;
+  const event = await ambilEvent(Number(id));
+  if (!event) notFound();
+  const jumlahPesanan = await hitungPesanan(event.id);
+  const jumlahTiket = await hitungTiket(event.id);
   const sisa = event.kuota - event.terisi;
-
+  const namaAwal = (await cookies()).get("nama")?.value ?? "";
   return (
-    <main className="max-w-4xl mx-auto px-4 py-8">
-      <article className="bg-white rounded-2xl border shadow-sm overflow-hidden p-6 md:p-8">
-        <div className="relative mb-4 aspect-[40/21] w-full">
-          <Image
-            src={event.gambar ?? "/img/default.png"}
-            alt={event.judul}
-            fill
-            sizes="(max-width: 1024px) 100vw, 960px"
-            preload
-            className="rounded-lg object-cover"
-          />
-        </div>
-
-        <div className="flex justify-between items-start mb-4">
-          <h1 className="text-2xl md:text-3xl font-bold text-slate-800">
-            {event.judul}
-          </h1>
-          <TombolFavorit id={Number(event.id)} />
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8 text-sm text-slate-600 bg-slate-50 p-4 rounded-xl border">
-          <div>
-            <p className="font-semibold text-slate-700">📅 Tanggal</p>
-            <p>{event.tanggal}</p>
-          </div>
-          <div>
-            <p className="font-semibold text-slate-700">📍 Lokasi</p>
-            <p>{event.lokasi}</p>
-          </div>
-          <div>
-            <p className="font-semibold text-slate-700">🎟️ Ketersediaan</p>
-            <p>{sisa} kursi tersisa dari {event.kuota} kuota</p>
-          </div>
-        </div>
-
-        <div className="mb-8">
-          <h2 className="text-lg font-bold text-slate-800 mb-2">Deskripsi Event</h2>
-          <p className="text-slate-600 leading-relaxed whitespace-pre-line">
-            {event.deskripsi}
-          </p>
-        </div>
-
-        <hr className="my-6" />
-
-        <div>
-          <h2 className="text-lg font-bold text-slate-800 mb-4">Pendaftaran Event</h2>
-          <FormPesan eventId={String(event.id)} harga={event.harga ?? 0} />
-        </div>
-      </article>
-    </main>
+    <article className="rounded-xl border bg-white p-6">
+      <div className="relative mb-4 aspect-[40/21] w-full">
+        <Image
+          src={event.gambar ?? "/img/default.png"}
+          alt={event.judul}
+          fill
+          sizes="(max-width: 1024px) 100vw, 960px"
+          preload
+          className="rounded-lg object-cover"
+        />
+      </div>
+      <span className="rounded bg-blue-100 px-2 py-0.5 text-xs text-blue-700">
+        {event.kategori}
+      </span>
+      <h1 className="mt-2 text-3xl font-bold">{event.judul}</h1>
+      <p className="mt-1 text-slate-500">
+        {event.tanggal} · {event.lokasi}
+      </p>
+      <p className="mt-4 text-xl font-semibold">{rupiah(event.harga)}</p>
+      <p className="text-slate-600">Sisa {sisa} dari {event.kuota} tiket</p>
+      <p className="text-sm text-slate-500">{jumlahPesanan} pesanan masuk lewat EventKu</p>
+      <p className="text-sm text-slate-500">{jumlahTiket} tiket dipesan lewat EventKu</p>
+      <TombolFavorit id={event.id} />
+      <FormPesan event={event} namaAwal={namaAwal} />
+      <section className="mt-6">
+        <h2 className="font-semibold">Event terkait</h2>
+        <Suspense fallback={<p className="text-slate-400">Memuat event terkait...</p>}>
+          <EventTerkait event={event} />
+        </Suspense>
+      </section>
+    </article>
   );
 }
